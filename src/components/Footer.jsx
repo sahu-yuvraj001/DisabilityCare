@@ -35,7 +35,7 @@ const Footer = () => {
       <ul className="space-y-2 text-gray-300">
         <li>
           <a href="#" className="hover:text-white">
-            (888) 777-8886
+            (855) 536-4572
           </a>
         </li>
       </ul>
@@ -45,7 +45,7 @@ const Footer = () => {
 
   {/* Bottom Copyright */}
   <div className="border-t border-gray-600 mt-10 pt-5 text-center text-gray-300 text-sm">
-    © 2025 DISABILITYASSIST CORP.
+    © 2025 Disability Claim Assist.
   </div>
 </footer>
 
