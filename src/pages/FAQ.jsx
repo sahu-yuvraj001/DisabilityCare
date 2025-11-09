@@ -4,29 +4,30 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 const faqs = [
   {
-    question: "What is Disability Claim Assist?",
+    question: "What does Disability Claim Assist do?",
     answer:
-      "Disability Claim Assist helps individuals navigate and simplify the process of applying for and managing federal DisabilityClaimAssist  benefits. We handle the paperwork, communication, and appeals so you can focus on your health.",
+      "Disability Claim Assist is a service that connects people who may qualify for Social Security Disability benefits with experienced advocates, case managers, or law firms. We help simplify the first step — reviewing your situation and getting you connected with professionals who can guide you through the SSDI application or appeal process.",
+  },
+  {
+    question: "Do you provide legal representation?",
+    answer:
+      "No. Disability Claim Assist does not provide legal advice or representation. Our role is to help match you with qualified professionals who specialize in SSDI cases. If you choose to work with them, they will handle the application, review, and appeals process directly with you.",
   },
   {
     question: "How much does this service cost?",
     answer:
-      "There are no upfront fees. Our assistance is provided on a contingency basis — meaning you only pay if your claim is approved.",
+      "Our qualification review and referral service is free.
+       If you decide to work with a disability advocate or attorney, fees are typically only collected if your case is approved, and they are regulated by the Social Security Administration.",
   },
   {
     question: "Is my information secure?",
     answer:
-      "Absolutely. We prioritize your privacy with secure encryption and strict confidentiality policies that protect all personal and medical data.",
+      "Yes. Your information is protected and only shared with qualified SSDI partners when necessary to help review your case. We do not sell or misuse personal data. Your privacy is always respected.",
   },
   {
-    question: "What types of disability benefits can I apply for?",
+    question: "Who do you help?",
     answer:
-      "We assist with Social Security DisabilityClaimAssist  Insurance (SSDI) and Supplemental Security Income (SSI) applications, appeals, and hearings.",
-  },
-  {
-    question: "How does the process work?",
-    answer:
-      "Once you contact us, our team reviews your eligibility, gathers necessary medical records, and guides you through each step — from application to appeal if needed.",
+      "We assist individuals who are unable to work due to a medical condition that is expected to last 12 months or longer. If you're unsure whether you qualify, our team can help determine your eligibility in just a few minutes.",
   },
 ];
 
