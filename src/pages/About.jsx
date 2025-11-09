@@ -17,10 +17,7 @@ const About = () => {
             About <span className="text-sky-400">DisabilityClaimAssist</span>
           </h1>
           <p className="text-gray-300 max-w-3xl mx-auto text-lg">
-            We are dedicated to helping individuals with disabilities receive
-            the benefits, care, and respect they truly deserve. Our mission is
-            to make every process simpler, more transparent, and full of
-            compassion.
+            Navigating the SSDI process alone can feel overwhelming. We are dedicated to helping individuals with disabilities find the expert assistance they need. Our mission is to simplify the journey by connecting you with qualified, compassionate lawyers and advocates who can fight for your rights.
           </p>
         </div>
       </motion.div>
@@ -44,11 +41,7 @@ const About = () => {
               Our Mission
             </h2>
             <p className="text-gray-300 leading-relaxed">
-              At DisabilityClaimAssist, we believe that every person — regardless of
-              physical or mental limitations — deserves fair access to support
-              and opportunities. Our team works tirelessly to guide individuals
-              through complex benefit systems and help them secure the
-              assistance they need.
+              At DisabilityClaimAssist, we believe that every person deserves a clear path to the benefits they're entitled to. Finding the right representation shouldn't be another barrier. Our team works tirelessly to bridge the gap, connecting individuals seeking support with our network of experienced SSDI professionals. We help you take the first step with confidence.
             </p>
           </div>
         </div>
@@ -66,11 +59,10 @@ const About = () => {
         viewport={{ once: true }}
       >
           <h3 className="text-xl font-semibold mb-3 text-sky-400 transition-colors duration-300 hover:text-white">
-            Compassion
+            Access
           </h3>
           <p className="text-gray-300 transition-colors duration-300 hover:text-gray-100">
-            We treat every client with empathy and dignity, offering support
-            every step of the way.
+            We believe in access, not obstacles. Our goal is to remove the confusion of finding help. We provide a simple, free, and fast way to connect with a professional who understands the SSDI system and is ready to listen.
           </p>
           </motion.div>
         </div>
@@ -87,8 +79,7 @@ const About = () => {
             Integrity
           </h3>
           <p className="text-gray-300 transition-colors duration-300 hover:text-gray-100">
-            We believe in honesty, transparency, and doing what’s right —
-            always.
+            We believe in trusted partnerships. We only partner with experienced lawyers and professional brokers who share our commitment to treating clients with dignity and respect. Your trust is our top priority.
           </p>
           </motion.div>
         </div>
@@ -102,11 +93,10 @@ const About = () => {
         viewport={{ once: true }}
       >
           <h3 className="text-xl font-semibold mb-3 text-sky-400 transition-colors duration-300 hover:text-white">
-            Commitment
+            Compassion
           </h3>
           <p className="text-gray-300 transition-colors duration-300 hover:text-gray-100">
-            Our mission doesn’t end with paperwork — we stand by you until
-            results are achieved.
+            We believe in putting people first. We understand the challenges you're facing. We are committed to a process that is empathetic, transparent, and focused on one thing: getting you in touch with the right people to help.
           </p>
           </motion.div>
         </div>
