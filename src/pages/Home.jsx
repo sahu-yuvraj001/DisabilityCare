@@ -22,8 +22,7 @@ const Home = () => {
           Social Security Disability (SSDI) Assistance
         </h1>
         <p className="text-[24px] md:text-[32px] text-[#001A54] max-w-2xl mb-10 leading-snug font-['Work_Sans',sans-serif]">
-          If a medical condition is keeping you from working a year or more, you
-          may qualify for Social Security Disability Insurance (SSDI).
+          If your medical condition limits your ability to work for a full year, you might be entitled to Social Security Disability Insurance (SSDI) Benefits.
         </p>
 
         <div className="relative">
