@@ -26,11 +26,11 @@ const BenifitSection = () => {
       link: "#",
     },
     {
-      title: "Why Atticus?",
+      title: "Why DisabilityClaimAssist ?",
       image: notifiapp, // replace with your image path
       points: [
-        "Get all your disability questions answered, for free.",
-        "Find a vetted disability lawyer to help win your claim.",
+        "Get all your DisabilityClaimAssist  questions answered, for free.",
+        "Find a vetted DisabilityClaimAssist  lawyer to help win your claim.",
       ],
       link: "#",
     },

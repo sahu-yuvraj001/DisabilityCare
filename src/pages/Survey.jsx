@@ -51,7 +51,7 @@ const Survey = () => {
     {
       type: "message",
       message:
-        "So far, your odds of qualifying look good. Based on your work history, it looks like you’ve met a crucial eligibility requirement for Social Security disability.",
+        "So far, your odds of qualifying look good. Based on your work history, it looks like you’ve met a crucial eligibility requirement for Social Security DisabilityClaimAssist .",
     },
     {
       type: "text",
@@ -75,7 +75,7 @@ const Survey = () => {
     {
       type: "multiple",
       question:
-        "Are you currently working with a lawyer on your disability claim?",
+        "Are you currently working with a lawyer on your DisabilityClaimAssist ?",
       options: ["Yes", "No"],
       key: "lawyer_status",
     },
@@ -247,7 +247,7 @@ const Survey = () => {
                   You’re already working with a lawyer 👏
                 </h1>
                 <p className="text-lg text-gray-700">
-                  That’s great! We wish you the best with your disability claim.
+                  That’s great! We wish you the best with your DisabilityClaimAssist .
                   If you ever need more assistance or a second opinion, our team
                   is here for you.
                 </p>

@@ -14,7 +14,7 @@ const About = () => {
         <div className="max-w-6xl mx-auto text-center">
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            About <span className="text-sky-400">Disability Care</span>
+            About <span className="text-sky-400">DisabilityClaimAssist</span>
           </h1>
           <p className="text-gray-300 max-w-3xl mx-auto text-lg">
             We are dedicated to helping individuals with disabilities receive
@@ -44,7 +44,7 @@ const About = () => {
               Our Mission
             </h2>
             <p className="text-gray-300 leading-relaxed">
-              At Disability Care, we believe that every person — regardless of
+              At DisabilityClaimAssist, we believe that every person — regardless of
               physical or mental limitations — deserves fair access to support
               and opportunities. Our team works tirelessly to guide individuals
               through complex benefit systems and help them secure the

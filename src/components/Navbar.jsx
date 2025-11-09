@@ -13,12 +13,11 @@ function Navbar() {
       <nav className="relative z-50 flex justify-between items-center px-6 md:px-16 py-4 bg-white shadow-sm">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link to="/">
-            <img
-              src={logo}
-              alt="Disability Logo"
-              className="w-[130px] h-[35px] cursor-pointer"
-            />
+          <Link
+            to="/"
+            className="text-2xl font-bold text-[#001A54] hover:text-blue-600 transition-colors duration-300 tracking-wide"
+          >
+            Disability<span className="text-blue-500">ClaimAssist</span>
           </Link>
         </div>
 
