@@ -16,8 +16,7 @@ const faqs = [
   {
     question: "How much does this service cost?",
     answer:
-      "Our qualification review and referral service is free.
-       If you decide to work with a disability advocate or attorney, fees are typically only collected if your case is approved, and they are regulated by the Social Security Administration.",
+      "Our qualification review and referral service is free. If you decide to work with a disability advocate or attorney, fees are typically only collected if your case is approved, and they are regulated by the Social Security Administration.",
   },
   {
     question: "Is my information secure?",
