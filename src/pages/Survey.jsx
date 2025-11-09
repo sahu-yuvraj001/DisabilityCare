@@ -291,7 +291,7 @@ const Survey = () => {
                   }}
                   className="mt-6 bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
                 >
-                  Connect with Atticus (It's 100% Free!)
+                  Connect with DisabilityCare (It's 100% Free!)
                 </button>
               </>
             )}
@@ -318,7 +318,10 @@ const Survey = () => {
                       <button
                         key={opt}
                         onClick={() => handleAnswer(questions[step].key, opt)}
-                        className="w-full border border-gray-300 hover:bg-red-600 hover:text-white rounded-lg py-3 text-lg font-medium hover:border-blue-500 transition"
+                        className="w-full border border-gray-300 rounded-lg py-3 text-lg font-medium 
+             transition-all duration-300 ease-in-out 
+             hover:bg-red-600 hover:text-white hover:border-blue-500 
+             hover:-translate-x-2 hover:-translate-y-2"
                       >
                         {opt}
                       </button>

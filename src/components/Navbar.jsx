@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import logo from "./Images/mainlogo.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 function Navbar() {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const toggleDropdown = (name) => {
@@ -21,33 +22,38 @@ function Navbar() {
             />
           </Link>
         </div>
+        <div className="hidden md:flex items-center gap-8 text-[#001A54] font-medium">
+          <ul className="hidden md:flex gap-8 text-[#001A54] font-medium">
+            <li>
+              <Link
+                to="/"
+                className="hover:text-red-600 transition-colors duration-200"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/about"
+                className="hover:text-red-600 transition-colors duration-200"
+              >
+                About
+              </Link>
+            </li>
+          </ul>
 
-        <ul className="hidden md:flex gap-8 text-[#001A54] font-medium">
-          <li>
-            <Link
-              to="/"
-              className="hover:text-red-600 transition-colors duration-200"
-            >
-              Home
+          {/* 🔹 Right Buttons (Desktop only) */}
+          {location.pathname === "/survey" ? (
+            <p className="text-[#001A54] font-semibold text-lg">
+              📞 (800) 674-8141
+            </p>
+          ) : (
+            <Link to="/survey">
+              <button className="bg-red-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-red-700 transition">
+                See if you qualify
+              </button>
             </Link>
-          </li>
-          <li>
-            <Link
-              to="/about"
-              className="hover:text-red-600 transition-colors duration-200"
-            >
-              About
-            </Link>
-          </li>
-        </ul>
-
-        {/* 🔹 Right Buttons (Desktop only) */}
-        <div className="hidden md:flex items-center gap-4">
-          <Link to="/survey">
-            <button className="bg-red-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-red-700 transition">
-              See if you qualify
-            </button>
-          </Link>
+          )}
         </div>
 
         {/* 🔹 Hamburger Button (Mobile) */}
@@ -79,10 +85,18 @@ function Navbar() {
               </Link>
             </div>
 
-            <div className="border-t border-gray-200 mt-3 pt-3 px-6 flex flex-col items-start gap-2">
-              <button className="bg-red-600 text-white font-semibold px-6 py-2 rounded-md hover:bg-red-700 transition">
-                Let’s Start
-              </button>
+            <div className="border-t border-gray-200 mt-3 pt-3 px-3 flex flex-col items-start gap-2">
+              {location.pathname === "/survey" ? (
+                <p className="text-[#001A54] font-semibold text-lg">
+                  📞 (800) 674-8141
+                </p>
+              ) : (
+                <Link to="/survey">
+                  <button className="bg-red-600 text-white font-semibold px-2 py-2 rounded-md hover:bg-red-700 transition">
+                    See if you qualify
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
         )}
