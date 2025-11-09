@@ -20,13 +20,13 @@ const ThankYou = () => {
         </p>
 
         <a
-          href="tel:8667615385"
+          href="tel:18555364572"
           className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg text-lg font-semibold transition-all shadow-md"
         >
           📞 Click To Call Now
         </a>
 
-        <p className="mt-4 text-gray-800 font-semibold text-xl">(866) 761-5385</p>
+        <p className="mt-4 text-gray-800 font-semibold text-xl">(855) 536-4572</p>
       </motion.div>
     </div>
   );
