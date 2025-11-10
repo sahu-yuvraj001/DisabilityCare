@@ -100,7 +100,7 @@ const PrivacyPage = () => {
               onClick={() => navigate("/contact")}
               className="text-blue-700 underline cursor-pointer"
             >
-              contact@medicare2go.online
+              contact@DisabilityClaimAssist.com
             </span>{" "}
           </p>
         </div>
@@ -146,7 +146,7 @@ const PrivacyPage = () => {
             <span className="italic font-semibold">
               Consenting to Do Business Electronically.
             </span>{" "}
-            Before you decide to request health coverage or medicare
+            Before you decide to request health coverage or SSDI Benefits
             electronically with a provider, you should consider whether 1. You
             wish to conduct business electronically, and 2. You have the
             required hardware and software capabilities described below.
@@ -189,7 +189,7 @@ const PrivacyPage = () => {
             You should keep your provider informed of any change in either your
             electronic address or physical mailing address. Your provider will
             have specific instructions on how to update your contact
-            information, if necessary. Please note that medicare2go.online
+            information, if necessary. Please note that DisabilityClaimAssist.com
             cannot update your information for you.
           </p>
           <p>
@@ -206,7 +206,7 @@ const PrivacyPage = () => {
             About Us and Our Purpose{" "}
           </h6>
           <p id="paragraph-2">
-            We operate, own and maintain medicare2go.online and may be referred
+            We operate, own and maintain DisabilityClaimAssist.com and may be referred
             to as ‘company&apos;, ‘us&apos;, ‘our&apos;, ‘we&apos;, ‘site&apos;
             or ‘website&apos; throughout this document and website. Through the
             use of this site, we also operate a database of prospective
@@ -253,7 +253,7 @@ const PrivacyPage = () => {
             Registry.
           </p>
           <p>
-            Medicare2Go does not make outbound phone calls to consumers, and
+            DisabilityClaimAssist does not make outbound phone calls to consumers, and
             therefore does not maintain an internal do not call registry of its
             own. If you no longer wish to receive phone calls from a provider
             you got connected with, you will have to contact them directly and
@@ -267,9 +267,9 @@ const PrivacyPage = () => {
           </h6>
           <p>Types of Information Collected </p>
           <p id="paragraph-5">
-            PERSONAL INFORMATION: medicare2go.online collects information from
+            PERSONAL INFORMATION: DisabilityClaimAssist.com collects information from
             both existing and prospective customers in an attempt to connect
-            them with Medicare partners for the products and services they
+            them with DisabilityClaimAssist partners for the products and services they
             request. You may be required to provide certain personal information
             to us when you elect to use certain products or services available
             on the Site. We do not collect any personal information about you
@@ -339,14 +339,14 @@ const PrivacyPage = () => {
           </p>
           <p>
             Even though we do not sell or share your information with any third
-            parties except for the licensed medicare partners in our network,
+            parties except for the licensed SSDI partners in our network,
             you can still submit a request to obtain this information. Please
             send an email message to{" "}
             <span
               onClick={() => navigate("/contact")}
               className="text-blue-700 underline cursor-pointer"
             >
-              contact@medicare2go.online
+              contact@DisabilityClaimAssist.com
             </span>{" "}
             with “Request for California Privacy Information” on the subject
             line and in the body of your message. We will provide the requested
@@ -366,18 +366,18 @@ const PrivacyPage = () => {
             website. During registration and/or when you submit personally
             identifiable information to us at this website, you acknowledge that
             you have opted-in to request that we share your personal information
-            with the participating medicare partners of our network in order to
+            with the participating SSDI partners of our network in order to
             fulfill your request. If at any time you wish to opt out from
-            receiving communications from medicare2go.online, please email{" "}
+            receiving communications from DisabilityClaimAssist.com, please email{" "}
             <span
               onClick={() => navigate("/contact")}
               className="text-blue-700 underline cursor-pointer"
             >
-              contact@medicare2go.online
+              contact@DisabilityClaimAssist.com
             </span>{" "}
             and request that communications cease, and to be added to the the do
             not contact list. Unsubscribe function instructions can also be
-            found on any email or sms communications from medicare2go.online, or
+            found on any email or sms communications from DisabilityClaimAssist.com, or
             you can use the unsubscribe feature here:{" "}
             <span
               onClick={() => navigate("/unsubscribe")}
@@ -389,7 +389,7 @@ const PrivacyPage = () => {
             .
           </p>
           <p>
-            If you are eventually contacted by any of medicare2go.online&apos;s
+            If you are eventually contacted by any of DisabilityClaimAssist.com&apos;s
             partners, you should notify them directly of your choices regarding
             their use and sharing of your information and if you so choose, you
             should communicate your decision to opt-out of receiving additional
@@ -405,16 +405,16 @@ const PrivacyPage = () => {
           <p id="paragraph-9">
             Under the California Consumer Protection Act of 2018, a consumer has
             the right to request, via verifiable request method, that
-            medicare2go.online delete any personal information about the
+            DisabilityClaimAssist.con delete any personal information about the
             consumer that has been collected. Upon receipt of such request,
-            Medicare2Go shall delete the information and shall direct its
+            DisabilityClaimAssist shall delete the information and shall direct its
             partners to delete the information from its records as well, except
             under limited circumstances where the consumer&apos;s information is
             required to: (1) compute the transaction for which the personal
             information was collected, provide a good or service requested by
             the consumer, or reasonably anticipated within the context of
-            Medicare2Go&apos;s ongoing business relationship with the consumer,
-            or otherwise perform a contract between Medicare2Go and the
+            DisabilityClaimAssist&apos;s ongoing business relationship with the consumer,
+            or otherwise perform a contract between DisabilityClaimAssist and the
             consumer; (2) detect security incidents; protect against malicious,
             deceptive, fraudulent, or illegal activity; or prosecute those
             responsible for that activity; (3) debug to identify and repair
@@ -426,13 +426,13 @@ const PrivacyPage = () => {
             statistical research in the public interest; (7) to enable solely
             internal uses that are reasonably aligned with the expectations of
             the consumer based on the consumer&apos;s relationship with
-            Medicare2Go; (8) comply with a legal obligation; (9) otherwise use
+            DisabilityClaimAssist; (8) comply with a legal obligation; (9) otherwise use
             the consumer&apos;s personal information, internally, in a lawful
             manner that is compatible with the context in which the consumer
             provided the information.
           </p>
           <p>
-            Any information you provide to Medicare2Go will be retained until
+            Any information you provide to DisabilityClaimAssist will be retained until
             you make the decision to cancel your account with us. If you want to
             cancel your account or if you want to request that we no longer use
             your information to provide you with products and services, you can
@@ -441,7 +441,7 @@ const PrivacyPage = () => {
               onClick={() => navigate("/contact")}
               className="text-blue-700 underline cursor-pointer"
             >
-              contact@medicare2go.online
+              contact@DisabilityClaimAssist.com
             </span>{" "}
             . Even after this request, your information may be retained for the
             appropriate amount of time to comply with various legal and
@@ -454,9 +454,9 @@ const PrivacyPage = () => {
           </h6>
           <p id="paragraph-10">
             Should you decide to exercise any of the above mentioned rights
-            under the California Consumer Protection Act, medicare2go.online is
+            under the California Consumer Protection Act, DisabilityClaimAssist.com is
             prohibited from discriminating against that consumer for that
-            exercise. However, important to note is that medicare2go.online also
+            exercise. However, important to note is that DisabilityClaimAssist.com also
             offers a different price, rate, level, or quality of goods or
             services to the consumer if that price or difference is directly
             related to the value provided to the consumer by the consumer&apos;s
@@ -488,7 +488,7 @@ const PrivacyPage = () => {
             Since the safety of your personal information is incredibly
             important to us, we use industry recognized methods to protect the
             information you provide to us as it is being transmitted to
-            medicare2go.online, and after we have received it. There is no
+            DisabilityClaimAssist.com, and after we have received it. There is no
             method of data transmission or storage that is 100% fail-proof, so
             we cannot guarantee the absolute security of your information. For
             more questions about the security methods used on our website,
@@ -497,7 +497,7 @@ const PrivacyPage = () => {
               onClick={() => navigate("/contact")}
               className="text-blue-700 underline cursor-pointer"
             >
-              contact@medicare2go.online
+              contact@DisabilityClaimAssist.com
             </span>{" "}
             . If you do not agree with our methods of protecting your
             information, we ask that you abstain from submitting any information
@@ -549,7 +549,7 @@ const PrivacyPage = () => {
           <p id="paragraph-15">
             This site also provides links to external sites, and our Privacy
             Policy does not cover these websites. Should you choose to leave
-            medicare2go.online via a link you find on our site, you should read
+            DisabilityClaimAssist.com via a link you find on our site, you should read
             and review the Privacy Policies associated with these websites
             thoroughly, as they may contain different terms.
           </p>
@@ -560,12 +560,12 @@ const PrivacyPage = () => {
           </h6>
           <p id="paragraph-16">
             If you would like to verify, correct, update or delete any of the
-            information you have provided to Medicare2Go, please contact us at{" "}
+            information you have provided to DisabilityClaimAssist, please contact us at{" "}
             <span
               onClick={() => navigate("/contact")}
               className="text-blue-700 underline cursor-pointer"
             >
-              contact@medicare2go.online
+              contact@DisabilityClaimAssist.com
             </span>{" "}
             .
           </p>
@@ -575,14 +575,14 @@ const PrivacyPage = () => {
             Notifications of Changes{" "}
           </h6>
           <p id="paragraph-17">
-            From time to time, Medicare2Go may make changes to this Privacy
+            From time to time, DisabilityClaimAssist may make changes to this Privacy
             Policy without further notice to its users. You should continue to
             review this Policy periodically to ensure that you are up-to-date
             and knowledgeable about any changes that are taking place.
           </p>
           <div className=" flex flex-col ">
             <p className=" font-semibold ">Mailing Address:</p>
-            <p>A1 Media LLC</p>
+            <p>DisabilityClaimAssist</p>
             <p>1735 Buford Hwy, Ste 215-225</p>
             <p>Cumming, GA 30041</p>
             <div className="flex gap-1">
@@ -591,7 +591,7 @@ const PrivacyPage = () => {
                 onClick={() => navigate("/contact")}
                 className="text-blue-700 underline cursor-pointer"
               >
-                contact@medicare2go.online
+                contact@DisabilityClaimAssist.com
               </a>
             </div>
           </div>
