@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import disablepic from "../components/Images/disable2.jpg";
 import BenifitSection from "./BenifitSection";
-import ClientHighlight from "./ClientHighlight";
 import { motion } from "framer-motion";
+import FAQ from "./FAQ";
 
 
 const Home = () => {
@@ -55,7 +55,7 @@ const Home = () => {
       </motion.div>
     </section>
     <BenifitSection/>
-    <ClientHighlight/>
+   <FAQ/>
     </>
   );
 };
