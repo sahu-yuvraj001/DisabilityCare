@@ -1,9 +1,10 @@
 import React from "react";
 import aboutpic from "../components/Images/about.jpg";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 const About = () => {
   return (
-    <section className="bg-[#00184E] text-white py-16 px-6 md:px-20">
+    <section className="bg-[#00184E] text-white py-16 px-6 md:px-20 mb-10">
       <motion.div
         className="flex-1 mb-10 md:mb-0"
         initial={{ opacity: 0, x: -80 }}
@@ -114,12 +115,11 @@ const About = () => {
         <h3 className="text-2xl font-semibold mb-4">
           Together, we can make a difference.
         </h3>
-        <a
-          href="/"
+        <Link to="/survey"
           className="inline-block bg-red-600 text-white px-6 py-3 rounded-full font-medium hover:bg-sky-400 transition"
         >
           Contact Us
-        </a>
+        </Link>
         </motion.div>
       </div>
     </section>

@@ -1,6 +1,7 @@
 import React from "react";
 import logo from "./Images/mainlogo.png";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <footer className="bg-[#00184E] text-white py-10 px-6 md:px-20">
@@ -17,14 +18,14 @@ const Footer = () => {
       <h2 className="font-semibold text-lg mb-3">Legal</h2>
       <ul className="space-y-2 text-gray-300">
         <li>
-          <a href="#" className="hover:text-white">
+          <Link to="/terms-conditions" className="hover:text-white">
             Terms and Conditions
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="#" className="hover:text-white">
+          <Link to="/privacy-policy" className="hover:text-white">
             Privacy Policy
-          </a>
+          </Link>
         </li>
       </ul>
     </div>

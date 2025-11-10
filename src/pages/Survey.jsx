@@ -4,102 +4,65 @@ import { motion, AnimatePresence } from "framer-motion";
 const Survey = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [isSubmitted, setIsSubmitted] = useState(false); 
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [name, setName] = useState("");
   const [qualified, setQualified] = useState(true);
   const [finished, setFinished] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  });
+  firstName: "",
+  lastName: "",
+  dob: "",
+  email: "",
+  phone: "",
+  address: "",
+  city: "",
+  state: "",
+  zip: "",
+});
+
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [agree, setAgree] = useState(false);
 
   const questions = [
     {
       type: "multiple",
-      question: "Are you working right now?",
-      options: ["Yes, I'm working", "No, I'm not working"],
+      question:
+        "Are you currently receiving social security disability benefits?",
+      options: ["Yes", "No"],
       key: "working_status",
     },
     {
       type: "multiple",
-      question: "On average, how many hours a week do you work?",
-      options: [
-        "0–9 hours",
-        "10–19 hours",
-        "20–29 hours",
-        "30–39 hours",
-        "40 hours or more",
-      ],
+      question:
+        "Are you out of work for atleast a year due to an injury or disability?",
+      options: ["Yes", "No"],
       key: "work_hours",
     },
     {
       type: "multiple",
-      question: "How long have you worked at your current job?",
-      options: ["Less than a year", "1 year", "2 years"],
+      question: "Have you worked atleast 5 out of the last 10 years?",
+      options: ["Yes", "No"],
       key: "job_duration",
     },
     {
       type: "multiple",
       question:
-        "Since 2015, have you worked for at least 5 years? It doesn’t have to be 5 years in a row and it doesn’t have to have been full-time work.",
+        "Have you seen a doctor for this specific issue in the past year?",
       options: ["Yes", "No"],
       key: "work_years",
     },
-    {
-      type: "message",
-      message:
-        "So far, your odds of qualifying look good. Based on your work history, it looks like you’ve met a crucial eligibility requirement for Social Security DisabilityClaimAssist .",
-    },
-    {
-      type: "text",
-      question:
-        "Let’s keep going to see if you qualify. First, what is your name?",
-      key: "name",
-    },
+
     {
       type: "multiple",
-      question: `Nice to meet you, ${
-        name || "friend"
-      }. So far, what’s happened in your application process? It’ll help us serve you better if we know where you are in the process. Select all that apply.`,
-      options: [
-        "I haven’t applied yet",
-        "I submitted an application",
-        "I got a denial notice (or two)",
-        "I have an upcoming hearing",
-      ],
-      key: "application_status",
-    },
-    {
-      type: "multiple",
-      question:
-        "Are you currently working with a lawyer on your DisabilityClaimAssist ?",
+      question: "Are you currently working with a lawyer on this case?",
       options: ["Yes", "No"],
       key: "lawyer_status",
     },
     {
-      type: "multiple",
-      question:
-        "How old are you? This helps us understand how much you qualify for.",
-      options: ["Under 18", "18–29", "30–49", "50 or above"],
-      key: "age",
-    },
-    {
-      type: "message",
-      message: `${
-        name ? name + "," : ""
-      } your odds of qualifying are looking even better. Good news: Since you’re over 50, your application is more likely to go through.`,
-      key: "age_message",
-      condition: (answers) => answers.age === "50 or above",
-    },
-    {
       type: "form",
-      question: "Create an account to find out if you qualify:",
     },
   ];
-  const [agree, setAgree] = useState(false);
+
   useEffect(() => {
     const existing = document.getElementById("LeadiDscript");
     if (!existing) {
@@ -125,67 +88,76 @@ const Survey = () => {
   const handleAnswer = (key, value) => {
     const newAnswers = { ...answers, [key]: value };
     setAnswers(newAnswers);
-    if (key === "name") setName(value);
 
-    // Disqualify if no
+    // Disqualify conditions
     if (key === "work_years" && value === "No") {
       setQualified(false);
       setFinished(true);
       return;
     }
-    if (key === "lawyer_status" && value == "Yes") {
+
+    if (key === "lawyer_status" && value === "Yes") {
       setQualified(false);
       setFinished(true);
       return;
     }
 
-    // Show special message for age 50+
-    if (key === "age" && value === "50 or above") {
+    // ✅ After last question, go to the form step instead of finishing
+    if (step < questions.length - 1) {
       setStep(step + 1);
-      return;
+    } else {
+      // instead of finishing, show form step
+      setStep(step + 1); // 👈 this goes to the "form" type question
     }
-
-    // Next
-    if (step < questions.length - 1) setStep(step + 1);
-    else setFinished(true);
   };
+
   // 🟦 Handle form submission
  const handleFormSubmit = async (e) => {
   e.preventDefault();
 
+  // ✅ Basic validation
   if (!agree) {
     alert("Please agree to the terms before submitting.");
     return;
   }
 
+  // ✅ Build lead payload
   const leadPayload = {
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    email: formData.email,
-    phone: formData.phone,
-    answers,
+    firstName: formData.firstName.trim(),
+    lastName: formData.lastName.trim(),
+    dob: formData.dob.trim(),
+    email: formData.email.trim(),
+    phone: formData.phone.trim(),
+    address: formData.address.trim(),
+    city: formData.city.trim(),
+    state: formData.state.trim(),
+    zip: formData.zip.trim(),
+    answers, // if you have survey answers
     leadid_token: document.getElementById("leadid_token")?.value || "",
   };
 
   try {
-    console.log("Submitting Lead Data:", leadPayload);
+    console.log("📤 Submitting Lead Data:", leadPayload);
 
-    const response = await fetch("https://lead-proxy-server.onrender.com/api/submit-lead", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(leadPayload),
-    });
+    const response = await fetch(
+      "https://lead-proxy-server.onrender.com/api/submit-lead",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(leadPayload),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("CORS block or API error");
     }
 
     console.log("✅ Lead submitted successfully");
-    window.location.href = "/thank-you";
+    window.location.href = "/thank-you"; // redirect after success
   } catch (error) {
-    console.warn("⚠️ Lead submission skipped (CORS block in browser).");
+    console.warn("⚠️ Lead submission failed:", error.message);
     console.log("Redirecting to success page for demo...");
-    window.location.href = "/thank-you";
+    window.location.href = "/thank-you"; // fallback redirect
   }
 };
 
@@ -247,9 +219,9 @@ const Survey = () => {
                   You’re already working with a lawyer 👏
                 </h1>
                 <p className="text-lg text-gray-700">
-                  That’s great! We wish you the best with your DisabilityClaimAssist .
-                  If you ever need more assistance or a second opinion, our team
-                  is here for you.
+                  That’s great! We wish you the best with your
+                  DisabilityClaimAssist . If you ever need more assistance or a
+                  second opinion, our team is here for you.
                 </p>
                 <div>
                   <button
@@ -318,7 +290,10 @@ const Survey = () => {
                       <button
                         key={opt}
                         onClick={() => handleAnswer(questions[step].key, opt)}
-                        className="w-full border border-gray-300 hover:bg-red-600 hover:text-white rounded-lg py-3 text-lg font-medium hover:border-blue-500 transition"
+                        className="w-full border border-gray-300 rounded-lg py-3 text-lg font-medium 
+             transition-all duration-300 ease-in-out 
+             hover:bg-red-600 hover:text-white hover:border-blue-500 
+             hover:-translate-x-2 hover:-translate-y-2"
                       >
                         {opt}
                       </button>
@@ -327,124 +302,185 @@ const Survey = () => {
                 </>
               )}
 
-              {questions[step].type === "text" && (
-                <div className="flex flex-col items-center">
-                  <h1 className="text-2xl md:text-3xl font-bold mb-6">
-                    {questions[step].question}
-                  </h1>
-                  <input
-                    type="text"
-                    placeholder="Enter your name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="border border-gray-300 hover:bg-red-600 hover:text-white rounded-lg px-4 py-2 w-full mb-4 focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                  <button
-                    onClick={() => handleAnswer(questions[step].key, name)}
-                    disabled={!name}
-                    className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-
-              {questions[step].type === "message" && (
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-bold mb-6">
-                    {questions[step].message}
-                  </h1>
-                  <button
-                    onClick={() => setStep(step + 1)}
-                    className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
-
               {questions[step].type === "form" && (
-                <form onSubmit={handleFormSubmit} className="space-y-4 text-left">
-                  {/* Hidden Jornaya field */}
-                  <input
-                    id="leadid_token"
-                    name="universal_leadid"
-                    type="hidden"
-                    value=""
-                  />
+ <form
+  onSubmit={handleFormSubmit}
+  className="space-y-6 text-left bg-white shadow-md rounded-xl p-8"
+>
+  {/* Hidden Jornaya field */}
+  <input id="leadid_token" name="universal_leadid" type="hidden" value="" />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="First Name"
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
-                      }
-                      required
-                      className="border border-gray-300  rounded-lg px-4 py-2 w-full"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Last Name"
-                      value={formData.lastName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, lastName: e.target.value })
-                      }
-                      required
-                      className="border border-gray-300  rounded-lg px-4 py-2 w-full"
-                    />
-                  </div>
+  {/* Name Fields */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        First <span className="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        value={formData.firstName}
+        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+        required
+        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+      />
+    </div>
 
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300  rounded-lg px-4 py-2 w-full"
-                  />
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Last <span className="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        value={formData.lastName}
+        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+        required
+        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+      />
+    </div>
+  </div>
 
-                  <input
-                    type="tel"
-                    placeholder="Phone Number"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300  rounded-lg px-4 py-2 w-full"
-                  />
+  {/* DOB */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      DOB <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="date"
+      value={formData.dob}
+      onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+      required
+      className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+    />
+  </div>
 
-                  {/* Disclaimer */}
-                  <label className="flex items-start space-x-2 text-sm text-gray-600">
-                    <input
-                      type="checkbox"
-                      checked={agree}
-                      onChange={(e) => setAgree(e.target.checked)}
-                      className="mt-1"
-                      required
-                    />
-                    <span>
-                      By checking this box, I confirm that I have read and agree
-                      to the{" "}
-                      <a href="/privacy" className="text-red-600 underline">
-                        Privacy Policy
-                      </a>{" "}
-                      and Terms of Service.
-                    </span>
-                  </label>
+  {/* Phone + Email */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Phone <span className="text-red-500">*</span>
+      </label>
+      <input
+        type="tel"
+        pattern="[0-9]{10}"
+        value={formData.phone}
+        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+        required
+        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+      />
+    </div>
 
-                  <button
-                    type="submit"
-                    className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition w-full"
-                  >
-                    Submit & Continue →
-                  </button>
-                </form>
-              )}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Email <span className="text-red-500">*</span>
+      </label>
+      <input
+        type="email"
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        required
+        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+      />
+    </div>
+  </div>
+
+  {/* Street Address */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Street Address <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="text"
+      value={formData.address}
+      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+      required
+      className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+    />
+  </div>
+
+  {/* City / State / Zip */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        City <span className="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        value={formData.city}
+        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+        required
+        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+      />
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        State <span className="text-red-500">*</span>
+      </label>
+      <select
+        value={formData.state}
+        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+        required
+        className="border border-gray-300 rounded-md px-4 py-2 w-full bg-white focus:ring-2 focus:ring-red-500 outline-none"
+      >
+        <option value="">Select State</option>
+        <option value="CA">California</option>
+        <option value="TX">Texas</option>
+        <option value="FL">Florida</option>
+        <option value="NY">New York</option>
+      </select>
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Zip <span className="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        value={formData.zip}
+        onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
+        required
+        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+      />
+    </div>
+  </div>
+
+  {/* Agreement Checkbox */}
+  <label className="flex items-start space-x-2 text-sm text-gray-600">
+    <input
+      type="checkbox"
+      checked={agree}
+      onChange={(e) => setAgree(e.target.checked)}
+      className="mt-1"
+      required
+    />
+    <span>
+      By checking this box, I confirm that I have read and agree to the{" "}
+      <a href="/privacy" className="text-red-600 underline">
+        Privacy Policy
+      </a>{" "}
+      and Terms of Service.
+    </span>
+  </label>
+
+  {/* Submit Button */}
+  <button
+    type="submit"
+    className="bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 transition w-full font-semibold shadow-sm"
+  >
+    Submit & Continue →
+  </button>
+
+  {/* Disclaimer */}
+  <div className="bg-black text-white text-xs p-4 rounded-md leading-relaxed mt-4">
+    By pressing the “Submit” button above, I provide my express written consent
+    to be contacted by phone, email, or text regarding disability benefits,
+    even if my number is on a do-not-call list. I understand I am not required
+    to provide consent as a condition of purchase.
+  </div>
+</form>
+
+)}
+
             </motion.div>
           </AnimatePresence>
         )}

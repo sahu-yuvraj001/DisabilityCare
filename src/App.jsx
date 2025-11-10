@@ -6,6 +6,8 @@ import Survey from "./pages/Survey";
 import Footer from "./components/Footer";
 import About from "./pages/About";
 import ThankYou from "./pages/ThankYou";
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
           <Route path="/survey" element={<Survey />} />
           <Route path="/about" element={<About />} />
           <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/terms-conditions" element={<TermsPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPage />} />
         </Routes>
         <Footer/>
       </Router>
