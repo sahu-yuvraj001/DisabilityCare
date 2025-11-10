@@ -22,6 +22,7 @@ const Survey = () => {
 
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [agree, setAgree] = useState(false);
+  const [trustedFormCert, setTrustedFormCert] = useState("");
 
   const questions = [
     {
@@ -63,27 +64,44 @@ const Survey = () => {
     },
   ];
 
-  useEffect(() => {
-    const existing = document.getElementById("LeadiDscript");
-    if (!existing) {
-      const s = document.createElement("script");
-      s.id = "LeadiDscript";
-      s.type = "text/javascript";
+ useEffect(() => {
+  // --- TrustedForm Script ---
+  const trustedScript = document.createElement("script");
+  trustedScript.type = "text/javascript";
+  trustedScript.async = true;
+  trustedScript.src =
+    "https://api.trustedform.com/trustedform.js?field=xxTrustedFormCertUrl&ping=0";
+  document.body.appendChild(trustedScript);
+
+  // --- Jornaya LeadID Script (client’s code) ---
+  const leadScript = document.createElement("script");
+  leadScript.id = "LeadiDscript";
+  leadScript.type = "text/javascript";
+  leadScript.innerHTML = `
+    (function() {
+      var s = document.createElement('script');
+      s.id = 'LeadiDscript_campaign';
+      s.type = 'text/javascript';
       s.async = true;
-      s.innerHTML = `
-        (function() {
-          var s = document.createElement('script');
-          s.id = 'LeadiDscript_campaign';
-          s.type = 'text/javascript';
-          s.async = true;
-          s.src = '//create.lidstatic.com/campaign/cc646acd-e437-e89d-0268-c2f00a16645e.js?snippet_version=2';
-          var LeadiDscript = document.getElementById('LeadiDscript');
-          LeadiDscript.parentNode.insertBefore(s, LeadiDscript);
-        })();
-      `;
-      document.body.appendChild(s);
-    }
-  }, []);
+      s.src = '//create.lidstatic.com/campaign/cc646acd-e437-e89d-0268-c2f00a16645e.js?snippet_version=2';
+      var LeadiDscript = document.getElementById('LeadiDscript');
+      LeadiDscript.parentNode.insertBefore(s, LeadiDscript);
+    })();
+  `;
+  document.body.appendChild(leadScript);
+
+  // Optional: add <noscript> image fallback for users with JS disabled
+  const noScript = document.createElement("noscript");
+  noScript.innerHTML = `<img src='//create.leadid.com/noscript.gif?lac=9C94555D-E31A-C8A3-C41D-78D72D4D23C8&lck=cc646acd-e437-e89d-0268-c2f00a16645e&snippet_version=2' />`;
+  document.body.appendChild(noScript);
+
+  return () => {
+    document.body.removeChild(trustedScript);
+    document.body.removeChild(leadScript);
+    document.body.removeChild(noScript);
+  };
+}, []);
+
 
   const handleAnswer = (key, value) => {
     const newAnswers = { ...answers, [key]: value };
@@ -111,55 +129,140 @@ const Survey = () => {
     }
   };
 
+  useEffect(() => {
+    // --- TrustedForm Script ---
+    const trustedScript = document.createElement("script");
+    trustedScript.type = "text/javascript";
+    trustedScript.async = true;
+    trustedScript.src =
+      "https://api.trustedform.com/trustedform.js?field=xxTrustedFormCertUrl&ping=0";
+    document.body.appendChild(trustedScript);
+
+    // --- Jornaya LeadID Script ---
+    const leadidScript = document.createElement("script");
+    leadidScript.type = "text/javascript";
+    leadidScript.async = true;
+    leadidScript.src =
+      "https://create.lidstatic.com/campaign/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.js"; // Replace with your real Jornaya campaign ID
+    document.body.appendChild(leadidScript);
+
+    // Cleanup on unmount
+    return () => {
+      document.body.removeChild(trustedScript);
+      document.body.removeChild(leadidScript);
+    };
+  }, []);
+
+  const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData((prevData) => ({
+    ...prevData,
+    [name]: value,
+  }));
+};
+
   // 🟦 Handle form submission
  const handleFormSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // ✅ Basic validation
-  if (!agree) {
-    alert("Please agree to the terms before submitting.");
+    if (!formData.firstName.trim()) {
+    alert("Please enter your first name.");
     return;
   }
 
-  // ✅ Build lead payload
-  const leadPayload = {
-    firstName: formData.firstName.trim(),
-    lastName: formData.lastName.trim(),
-    dob: formData.dob.trim(),
-    email: formData.email.trim(),
-    phone: formData.phone.trim(),
-    address: formData.address.trim(),
-    city: formData.city.trim(),
-    state: formData.state.trim(),
-    zip: formData.zip.trim(),
-    answers, // if you have survey answers
-    leadid_token: document.getElementById("leadid_token")?.value || "",
-  };
+  if (!formData.lastName.trim()) {
+    alert("Please enter your last name.");
+    return;
+  }
+ if (!formData.dob.trim()) {
+    alert("Please select your date of birth.");
+    return;
+  }
+if (!formData.phone.trim()) {
+    alert("Please enter your phone number.");
+    return;
+  }
 
-  try {
-    console.log("📤 Submitting Lead Data:", leadPayload);
+  // ✅ Phone number validation (10 digits)
+  const phonePattern = /^[0-9]{10}$/;
+  if (!phonePattern.test(formData.phone)) {
+    alert("Please enter a valid 10-digit phone number.");
+    return;
+  }
 
-    const response = await fetch(
-      "https://lead-proxy-server.onrender.com/api/submit-lead",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(leadPayload),
-      }
-    );
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(formData.email)) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+  if (!formData.email.trim()) {
+    alert("Please enter your email address.");
+    return;
+  }
+  
+  
+ if (!formData.address.trim()) {
+  alert("Please enter your street address.");
+  return;
+}
+if (!formData.city.trim()) {
+    alert("Please Enter your city.");
+    return;
+  }
 
-    if (!response.ok) {
-      throw new Error("CORS block or API error");
+  if (!formData.state.trim()) {
+    alert("Please select your state.");
+    return;
+  }
+  if (!formData.zip.trim()) {
+    alert("Please Enter your Zip.");
+    return;
+  }
+
+    if (!agree) {
+      alert("Please agree to the terms before submitting.");
+      return;
     }
 
-    console.log("✅ Lead submitted successfully");
-    window.location.href = "/thank-you"; // redirect after success
-  } catch (error) {
-    console.warn("⚠️ Lead submission failed:", error.message);
-    console.log("Redirecting to success page for demo...");
-    window.location.href = "/thank-you"; // fallback redirect
-  }
-};
+    const leadPayload = {
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      dob: formData.dob.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      address: formData.address.trim(),
+      city: formData.city.trim(),
+      state: formData.state.trim(),
+      zip: formData.zip.trim(),
+
+      // 🟢 Include hidden tracking fields
+      leadid_token: document.getElementById("leadid_token")?.value || "",
+      trustedform_cert_url:
+        document.getElementById("xxTrustedFormCertUrl")?.value || "",
+    };
+
+    try {
+      console.log("📤 Submitting Lead Data:", leadPayload);
+
+      const response = await fetch(
+        "https://lead-proxy-server.onrender.com/api/submit-lead",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(leadPayload),
+        }
+      );
+
+      if (!response.ok) throw new Error("API error or CORS issue");
+
+      console.log("✅ Lead submitted successfully");
+      window.location.href = "/thank-you";
+    } catch (error) {
+      console.warn("⚠️ Lead submission failed:", error.message);
+      // Optional fallback
+      window.location.href = "/thank-you";
+    }
+  };
 
 
   const handlePrev = () => setStep((prev) => Math.max(prev - 1, 0));
@@ -304,180 +407,194 @@ const Survey = () => {
 
               {questions[step].type === "form" && (
  <form
-  onSubmit={handleFormSubmit}
-  className="space-y-6 text-left bg-white shadow-md rounded-xl p-8"
+      onSubmit={handleFormSubmit}
+      className="space-y-6 text-left bg-white shadow-md rounded-xl p-8"
+    >
+      {/* Hidden Tracking Fields */}
+      <input id="leadid_token" name="universal_leadid" type="hidden" value="" />
+      <input
+        id="xxTrustedFormCertUrl"
+        name="xxTrustedFormCertUrl"
+        type="hidden"
+        value={trustedFormCert}
+      />
+
+      {/* Name Fields */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            First <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.firstName}
+            onChange={(e) =>
+              setFormData({ ...formData, firstName: e.target.value })
+            }
+            
+            className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Last <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.lastName}
+            onChange={(e) =>
+              setFormData({ ...formData, lastName: e.target.value })
+            }
+            
+            className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+          />
+        </div>
+      </div>
+
+      {/* DOB */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          DOB <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="date"
+          value={formData.dob}
+          onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+          
+          className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+        />
+      </div>
+
+      {/* Phone + Email */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Phone <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            pattern="[0-9]{10}"
+            value={formData.phone}
+            onChange={(e) =>
+              setFormData({ ...formData, phone: e.target.value })
+            }
+            
+            className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Email <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
+            
+            className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Address */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Street Address <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={formData.address}
+          onChange={(e) =>
+            setFormData({ ...formData, address: e.target.value })
+          }
+          
+          className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+        />
+      </div>
+
+      {/* City / State / Zip */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            City <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.city}
+            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+            
+            className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            State <span className="text-red-500">*</span>
+          </label>
+          <select
+  name="state"
+  value={formData.state}
+  onChange={handleChange}
+  className="w-full border rounded-md p-2"
+  
 >
-  {/* Hidden Jornaya field */}
-  <input id="leadid_token" name="universal_leadid" type="hidden" value="" />
+  <option value="">Select State</option>
+  <option value="CA">California</option>
+  <option value="FL">Florida</option>
+  <option value="NY">New York</option>
+  <option value="TX">Texas</option>
+  <option value="IL">Illinois</option>
+  {/* Add others if needed */}
+</select>
 
-  {/* Name Fields */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        First <span className="text-red-500">*</span>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Zip <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.zip}
+            onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
+            
+            className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Agreement */}
+      <label className="flex items-start space-x-2 text-sm text-gray-600">
+        <input
+          type="checkbox"
+          checked={agree}
+          onChange={(e) => setAgree(e.target.checked)}
+          className="mt-1 w-5 h-5 bg-green-500"
+          
+        />
+        <span>
+          By checking this box, I confirm that I have read and agree to the{" "}
+          <a href="/privacy" className="text-red-600 underline">
+            Privacy Policy
+          </a>{" "}
+          and Terms of Service.
+        </span>
       </label>
-      <input
-        type="text"
-        value={formData.firstName}
-        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-        required
-        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
-      />
-    </div>
 
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Last <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        value={formData.lastName}
-        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-        required
-        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
-      />
-    </div>
-  </div>
-
-  {/* DOB */}
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
-      DOB <span className="text-red-500">*</span>
-    </label>
-    <input
-      type="date"
-      value={formData.dob}
-      onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-      required
-      className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
-    />
-  </div>
-
-  {/* Phone + Email */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Phone <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="tel"
-        pattern="[0-9]{10}"
-        value={formData.phone}
-        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-        required
-        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
-      />
-    </div>
-
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Email <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="email"
-        value={formData.email}
-        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        required
-        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
-      />
-    </div>
-  </div>
-
-  {/* Street Address */}
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
-      Street Address <span className="text-red-500">*</span>
-    </label>
-    <input
-      type="text"
-      value={formData.address}
-      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-      required
-      className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
-    />
-  </div>
-
-  {/* City / State / Zip */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        City <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        value={formData.city}
-        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-        required
-        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
-      />
-    </div>
-
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        State <span className="text-red-500">*</span>
-      </label>
-      <select
-        value={formData.state}
-        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-        required
-        className="border border-gray-300 rounded-md px-4 py-2 w-full bg-white focus:ring-2 focus:ring-red-500 outline-none"
+      <button
+        type="submit"
+        className="bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 transition w-full font-semibold shadow-sm"
       >
-        <option value="">Select State</option>
-        <option value="CA">California</option>
-        <option value="TX">Texas</option>
-        <option value="FL">Florida</option>
-        <option value="NY">New York</option>
-      </select>
-    </div>
+        Submit & Continue →
+      </button>
 
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Zip <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        value={formData.zip}
-        onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
-        required
-        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
-      />
-    </div>
-  </div>
-
-  {/* Agreement Checkbox */}
-  <label className="flex items-start space-x-2 text-sm text-gray-600">
-    <input
-      type="checkbox"
-      checked={agree}
-      onChange={(e) => setAgree(e.target.checked)}
-      className="mt-1"
-      required
-    />
-    <span>
-      By checking this box, I confirm that I have read and agree to the{" "}
-      <a href="/privacy" className="text-red-600 underline">
-        Privacy Policy
-      </a>{" "}
-      and Terms of Service.
-    </span>
-  </label>
-
-  {/* Submit Button */}
-  <button
-    type="submit"
-    className="bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 transition w-full font-semibold shadow-sm"
-  >
-    Submit & Continue →
-  </button>
-
-  {/* Disclaimer */}
-  <div className="bg-black text-white text-xs p-4 rounded-md leading-relaxed mt-4">
-    By pressing the “Submit” button above, I provide my express written consent
-    to be contacted by phone, email, or text regarding disability benefits,
-    even if my number is on a do-not-call list. I understand I am not required
-    to provide consent as a condition of purchase.
-  </div>
-</form>
+      <div className="bg-black text-white text-xs p-4 rounded-md leading-relaxed mt-4">
+        By pressing the “Submit” button above, I provide my express written
+        consent to be contacted by phone, email, or text regarding disability
+        benefits, even if my number is on a do-not-call list. I understand I am
+        not required to provide consent as a condition of purchase.
+      </div>
+    </form>
 
 )}
 
