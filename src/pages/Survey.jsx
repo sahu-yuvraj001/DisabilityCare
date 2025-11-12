@@ -1,50 +1,56 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Survey = () => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [isSubmitted, setIsSubmitted] = useState(false); 
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [name, setName] = useState("");
   const [qualified, setQualified] = useState(true);
   const [finished, setFinished] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    dob: "",
     email: "",
     phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
   });
+
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [agree, setAgree] = useState(false);
+  const [trustedFormCert, setTrustedFormCert] = useState("");
 
   const questions = [
     {
       type: "multiple",
-      question: "Are you working right now?",
-      options: ["Yes, I'm working", "No, I'm not working"],
+      question:
+        "Are you currently receiving social security disability benefits?",
+      options: ["Yes", "No"],
       key: "working_status",
     },
     {
       type: "multiple",
-      question: "On average, how many hours a week do you work?",
-      options: [
-        "0–9 hours",
-        "10–19 hours",
-        "20–29 hours",
-        "30–39 hours",
-        "40 hours or more",
-      ],
+      question:
+        "Are you out of work for atleast a year due to an injury or disability?",
+      options: ["Yes", "No"],
       key: "work_hours",
     },
     {
       type: "multiple",
-      question: "How long have you worked at your current job?",
-      options: ["Less than a year", "1 year", "2 years"],
+      question: "Have you worked atleast 5 out of the last 10 years?",
+      options: ["Yes", "No"],
       key: "job_duration",
     },
     {
       type: "multiple",
       question:
-        "Since 2015, have you worked for at least 5 years? It doesn’t have to be 5 years in a row and it doesn’t have to have been full-time work.",
+        "Have you seen a doctor for this specific issue in the past year?",
       options: ["Yes", "No"],
       key: "work_years",
     },
@@ -80,393 +86,604 @@ const Survey = () => {
       key: "lawyer_status",
     },
     {
-      type: "multiple",
-      question:
-        "How old are you? This helps us understand how much you qualify for.",
-      options: ["Under 18", "18–29", "30–49", "50 or above"],
-      key: "age",
-    },
-    {
-      type: "message",
-      message: `${
-        name ? name + "," : ""
-      } your odds of qualifying are looking even better. Good news: Since you’re over 50, your application is more likely to go through.`,
-      key: "age_message",
-      condition: (answers) => answers.age === "50 or above",
-    },
-    {
       type: "form",
-      question: "Create an account to find out if you qualify:",
     },
   ];
-  const [agree, setAgree] = useState(false);
-  useEffect(() => {
-    const existing = document.getElementById("LeadiDscript");
-    if (!existing) {
-      const s = document.createElement("script");
-      s.id = "LeadiDscript";
-      s.type = "text/javascript";
-      s.async = true;
-      s.innerHTML = `
-        (function() {
-          var s = document.createElement('script');
-          s.id = 'LeadiDscript_campaign';
-          s.type = 'text/javascript';
-          s.async = true;
-          s.src = '//create.lidstatic.com/campaign/cc646acd-e437-e89d-0268-c2f00a16645e.js?snippet_version=2';
-          var LeadiDscript = document.getElementById('LeadiDscript');
-          LeadiDscript.parentNode.insertBefore(s, LeadiDscript);
-        })();
-      `;
-      document.body.appendChild(s);
-    }
-  }, []);
 
   const handleAnswer = (key, value) => {
     const newAnswers = { ...answers, [key]: value };
     setAnswers(newAnswers);
-    if (key === "name") setName(value);
 
-    // Disqualify if no
+    // Disqualify conditions
     if (key === "work_years" && value === "No") {
       setQualified(false);
       setFinished(true);
       return;
     }
-    if (key === "lawyer_status" && value == "Yes") {
+
+    if (key === "lawyer_status" && value === "Yes") {
       setQualified(false);
       setFinished(true);
       return;
     }
 
-    // Show special message for age 50+
-    if (key === "age" && value === "50 or above") {
+    // ✅ After last question, go to the form step instead of finishing
+    if (step < questions.length - 1) {
       setStep(step + 1);
+    } else {
+      // instead of finishing, show form step
+      setStep(step + 1); // 👈 this goes to the "form" type question
+    }
+  };
+  useEffect(() => {
+    // Wait for form to mount
+    setTimeout(() => {
+      // Inject TrustedForm Script
+      const trustedScript = document.createElement("script");
+      trustedScript.type = "text/javascript";
+      trustedScript.async = true;
+      trustedScript.src =
+        "https://api.trustedform.com/trustedform.js?field=xxTrustedFormCertUrl&ping=0";
+      document.body.appendChild(trustedScript);
+    }, 500);
+
+    // Inject Jornaya LeadID Script
+    const leadScript = document.createElement("script");
+    leadScript.id = "LeadiDscript";
+    leadScript.type = "text/javascript";
+    leadScript.async = true;
+    leadScript.src =
+      "//create.lidstatic.com/campaign/cc646acd-e437-e89d-0268-c2f00a16645e.js?snippet_version=2";
+    document.body.appendChild(leadScript);
+
+    // Cleanup
+    return () => {
+      document
+        .querySelectorAll("script[src*='trustedform']")
+        .forEach((el) => el.remove());
+      document
+        .querySelectorAll("script[src*='lidstatic']")
+        .forEach((el) => el.remove());
+    };
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // 🟦 Handle form submission
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    // ✅ Basic Validation
+    if (!formData.firstName.trim()) {
+      alert("Please enter your first name.");
       return;
     }
 
-    // Next
-    if (step < questions.length - 1) setStep(step + 1);
-    else setFinished(true);
-  };
-  // 🟦 Handle form submission
- const handleFormSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!agree) {
-    alert("Please agree to the terms before submitting.");
-    return;
-  }
-
-  const leadPayload = {
-    firstName: formData.firstName,
-    lastName: formData.lastName,
-    email: formData.email,
-    phone: formData.phone,
-    answers,
-    leadid_token: document.getElementById("leadid_token")?.value || "",
-  };
-
-  try {
-    console.log("Submitting Lead Data:", leadPayload);
-
-    const response = await fetch("https://lead-proxy-server.onrender.com/api/submit-lead", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(leadPayload),
-    });
-
-    if (!response.ok) {
-      throw new Error("CORS block or API error");
+    if (!formData.lastName.trim()) {
+      alert("Please enter your last name.");
+      return;
     }
 
-    console.log("✅ Lead submitted successfully");
-    window.location.href = "/thank-you";
-  } catch (error) {
-    console.warn("⚠️ Lead submission skipped (CORS block in browser).");
-    console.log("Redirecting to success page for demo...");
-    window.location.href = "/thank-you";
-  }
-};
+    if (!formData.dob.trim()) {
+      alert("Please select your date of birth.");
+      return;
+    }
 
+    if (!formData.phone.trim()) {
+      alert("Please enter your phone number.");
+      return;
+    }
+
+    const phonePattern = /^[0-9]{10}$/;
+    if (!phonePattern.test(formData.phone)) {
+      alert("Please enter a valid 10-digit phone number.");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      alert("Please enter your email address.");
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!formData.address.trim()) {
+      alert("Please enter your street address.");
+      return;
+    }
+
+    if (!formData.city.trim()) {
+      alert("Please enter your city.");
+      return;
+    }
+
+    if (!formData.state.trim()) {
+      alert("Please select your state.");
+      return;
+    }
+
+    if (!formData.zip.trim()) {
+      alert("Please enter your ZIP code.");
+      return;
+    }
+    const zipPattern = /^[0-9]{5}$/;
+    if (!zipPattern.test(formData.zip.trim())) {
+      alert("Please enter a valid 5-digit ZIP code.");
+      return;
+    }
+
+    if (!agree) {
+      alert("Please agree to the terms before submitting.");
+      return;
+    }
+
+    try {
+      // ✅ Get user IP (required for backend)
+      const ipResponse = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipResponse.json();
+      const userIp = ipData.ip || "";
+
+      // ✅ Build Lead Payload
+      const leadPayload = {
+        apiId: "963855192790468D98BCA220F3108C41",
+        apiPassword: "7f63537",
+        productId: "265",
+        price: "0.01",
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        dob: formData.dob.trim(),
+        emailAddress: formData.email.trim(),
+        phoneNumber: formData.phone.trim(),
+        address: formData.address.trim(),
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        zipCode: formData.zip.trim(),
+        userIp: userIp,
+        webSiteUrl: "disabilityclaimassist.com",
+        leadid_token: document.getElementById("leadid_token")?.value || "",
+        trustedform_cert_url:
+          document.getElementById("xxTrustedFormCertUrl")?.value || "",
+      };
+
+      // ✅ Send to Render Proxy
+      const response = await fetch(
+        "https://lead-proxy-server.onrender.com/api/submit-lead",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(leadPayload),
+        }
+      );
+
+      if (!response.ok) throw new Error("API error or CORS issue");
+      toast.success("✅ Form submitted successfully!");
+      console.log("✅ Form submitted successfully");
+      window.location.href = "/thank-you";
+    } catch (error) {
+      toast.error("❌ Something went wrong. Redirecting...");
+      // Fallback redirect
+      window.location.href = "/thank-you";
+    }
+  };
 
   const handlePrev = () => setStep((prev) => Math.max(prev - 1, 0));
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-[#001A54] px-6 py-10">
-      <div className="max-w-2xl w-full text-center">
-        {/* FINAL MESSAGE */}
-        {finished && formSubmitted && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            <h1 className="text-3xl md:text-4xl font-bold text-green-700">
-              Your chances of qualifying: High ✅
-            </h1>
-            <p className="text-lg text-gray-700">
-              We’re closed now, but call us any time between <br />
-              <strong>6:30 PM and 8:30 AM Monday – Friday</strong> at <br />
-              <span className="font-bold text-[#001A54]">(800) 674-8141</span>.
-              <br />
-              We’ll help you apply for benefits.
-            </p>
-            <button
-              onClick={() => {
-                setStep(0);
-                setFinished(false);
-                setQualified(true);
-                setAnswers({});
-                setName("");
-                setFormSubmitted(false);
-                setFormData({
-                  firstName: "",
-                  lastName: "",
-                  email: "",
-                  phone: "",
-                });
-              }}
-              className="mt-6 bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
-            >
-              Start Over
-            </button>
-          </motion.div>
-        )}
+    <>
+      <ToastContainer position="top-center" autoClose={2000} />
 
-        {/* IF DISQUALIFIED */}
-        {finished && !qualified && !formSubmitted && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            {answers.lawyer_status === "Yes" ? (
-              <>
-                <h1 className="text-4xl font-bold text-sky-600">
-                  You’re already working with a lawyer 👏
-                </h1>
-                <p className="text-lg text-gray-700">
-                  That’s great! We wish you the best with your DisabilityClaimAssist  claim.
-                  If you ever need more assistance or a second opinion, our team
-                  is here for you.
-                </p>
-                <div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white text-[#001A54] px-6 py-10">
+        <div className="max-w-2xl w-full text-center">
+          {/* FINAL MESSAGE */}
+          {finished && formSubmitted && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <h1 className="text-3xl md:text-4xl font-bold text-green-700">
+                Your chances of qualifying: High ✅
+              </h1>
+              <p className="text-lg text-gray-700">
+                We’re closed now, but call us any time between <br />
+                <strong>6:30 PM and 8:30 AM Monday – Friday</strong> at <br />
+                <span className="font-bold text-[#001A54]">(800) 674-8141</span>
+                .
+                <br />
+                We’ll help you apply for benefits.
+              </p>
+              <button
+                onClick={() => {
+                  setStep(0);
+                  setFinished(false);
+                  setQualified(true);
+                  setAnswers({});
+                  setName("");
+                  setFormSubmitted(false);
+                  setFormData({
+                    firstName: "",
+                    lastName: "",
+                    email: "",
+                    phone: "",
+                  });
+                }}
+                className="mt-6 bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
+              >
+                Start Over
+              </button>
+            </motion.div>
+          )}
+
+          {/* IF DISQUALIFIED */}
+          {finished && !qualified && !formSubmitted && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              {answers.lawyer_status === "Yes" ? (
+                <>
+                  <h1 className="text-4xl font-bold text-sky-600">
+                    You’re already working with a lawyer 👏
+                  </h1>
+                  <p className="text-lg text-gray-700">
+                    That’s great! We wish you the best with your
+                    DisabilityClaimAssist . If you ever need more assistance or
+                    a second opinion, our team is here for you.
+                  </p>
+                  <div>
+                    <button
+                      onClick={() => {
+                        setStep(0);
+                        setFinished(false);
+                        setQualified(true);
+                        setAnswers({});
+                        setName("");
+                        setFormSubmitted(false);
+                        setFormData({
+                          firstName: "",
+                          lastName: "",
+                          email: "",
+                          phone: "",
+                        });
+                      }}
+                      className="mt-6 bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
+                    >
+                      Start Over
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-4xl font-bold text-red-600">
+                    We’re sorry 😔
+                  </h1>
+                  <p className="text-lg text-gray-700">
+                    Based on your answers, you might not currently qualify. But
+                    feel free to contact our team for help.
+                  </p>
                   <button
                     onClick={() => {
                       setStep(0);
                       setFinished(false);
                       setQualified(true);
                       setAnswers({});
-                      setName("");
-                      setFormSubmitted(false);
-                      setFormData({
-                        firstName: "",
-                        lastName: "",
-                        email: "",
-                        phone: "",
-                      });
                     }}
                     className="mt-6 bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
                   >
-                    Start Over
+                    Connect with Atticus (It's 100% Free!)
                   </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h1 className="text-4xl font-bold text-red-600">
-                  We’re sorry 😔
-                </h1>
-                <p className="text-lg text-gray-700">
-                  Based on your answers, you might not currently qualify. But
-                  feel free to contact our team for help.
-                </p>
-                <button
-                  onClick={() => {
-                    setStep(0);
-                    setFinished(false);
-                    setQualified(true);
-                    setAnswers({});
-                  }}
-                  className="mt-6 bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
-                >
-                  Connect with DisabilityClaimAssist  (It's 100% Free!)
-                </button>
-              </>
-            )}
-          </motion.div>
-        )}
+                </>
+              )}
+            </motion.div>
+          )}
 
-        {/* QUESTIONS FLOW */}
-        {!finished && (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {questions[step].type === "multiple" && (
-                <>
-                  <h1 className="text-2xl md:text-3xl font-bold mb-8">
-                    {questions[step].question}
-                  </h1>
-                  <div className="space-y-4">
-                    {questions[step].options.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => handleAnswer(questions[step].key, opt)}
-                        className="w-full border border-gray-300 rounded-lg py-3 text-lg font-medium 
+          {/* QUESTIONS FLOW */}
+          {!finished && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {questions[step].type === "multiple" && (
+                  <>
+                    <h1 className="text-2xl md:text-3xl font-bold mb-8">
+                      {questions[step].question}
+                    </h1>
+                    <div className="space-y-4">
+                      {questions[step].options.map((opt) => (
+                        <button
+                          key={opt}
+                          onClick={() => handleAnswer(questions[step].key, opt)}
+                          className="w-full border border-gray-300 rounded-lg py-3 text-lg font-medium 
              transition-all duration-300 ease-in-out 
              hover:bg-red-600 hover:text-white hover:border-blue-500 
              hover:-translate-x-2 hover:-translate-y-2"
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
 
-              {questions[step].type === "text" && (
-                <div className="flex flex-col items-center">
-                  <h1 className="text-2xl md:text-3xl font-bold mb-6">
-                    {questions[step].question}
-                  </h1>
-                  <input
-                    type="text"
-                    placeholder="Enter your name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="border border-gray-300 hover:bg-red-600 hover:text-white rounded-lg px-4 py-2 w-full mb-4 focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                  <button
-                    onClick={() => handleAnswer(questions[step].key, name)}
-                    disabled={!name}
-                    className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
+                {questions[step].type === "form" && (
+                  <form
+                    onSubmit={handleFormSubmit}
+                    className="space-y-6 text-left bg-white shadow-md rounded-xl p-8"
                   >
-                    Next
-                  </button>
-                </div>
-              )}
-
-              {questions[step].type === "message" && (
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-bold mb-6">
-                    {questions[step].message}
-                  </h1>
-                  <button
-                    onClick={() => setStep(step + 1)}
-                    className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
-
-              {questions[step].type === "form" && (
-                <form onSubmit={handleFormSubmit} className="space-y-4 text-left">
-                  {/* Hidden Jornaya field */}
-                  <input
-                    id="leadid_token"
-                    name="universal_leadid"
-                    type="hidden"
-                    value=""
-                  />
-
-                  <div className="grid grid-cols-2 gap-4">
+                    {/* Hidden Tracking Fields */}
                     <input
-                      type="text"
-                      placeholder="First Name"
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
-                      }
-                      required
-                      className="border border-gray-300  rounded-lg px-4 py-2 w-full"
+                      id="leadid_token"
+                      name="universal_leadid"
+                      type="hidden"
+                      // value=""
                     />
                     <input
-                      type="text"
-                      placeholder="Last Name"
-                      value={formData.lastName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, lastName: e.target.value })
-                      }
-                      required
-                      className="border border-gray-300  rounded-lg px-4 py-2 w-full"
+                      id="xxTrustedFormCertUrl"
+                      name="xxTrustedFormCertUrl"
+                      type="hidden"
                     />
-                  </div>
 
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300  rounded-lg px-4 py-2 w-full"
-                  />
+                    {/* Name Fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          First <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.firstName}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              firstName: e.target.value,
+                            })
+                          }
+                          className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Last <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.lastName}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              lastName: e.target.value,
+                            })
+                          }
+                          className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+                        />
+                      </div>
+                    </div>
 
-                  <input
-                    type="tel"
-                    placeholder="Phone Number"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300  rounded-lg px-4 py-2 w-full"
-                  />
+                    {/* DOB */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        DOB <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.dob}
+                        onChange={(e) =>
+                          setFormData({ ...formData, dob: e.target.value })
+                        }
+                        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+                      />
+                    </div>
 
-                  {/* Disclaimer */}
-                  <label className="flex items-start space-x-2 text-sm text-gray-600">
-                    <input
-                      type="checkbox"
-                      checked={agree}
-                      onChange={(e) => setAgree(e.target.checked)}
-                      className="mt-1"
-                      required
-                    />
-                    <span>
-                      By checking this box, I confirm that I have read and agree
-                      to the{" "}
-                      <a href="/privacy" className="text-red-600 underline">
-                        Privacy Policy
-                      </a>{" "}
-                      and Terms of Service.
-                    </span>
-                  </label>
+                    {/* Phone + Email */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          pattern="[0-9]{10}"
+                          value={formData.phone}
+                          onChange={(e) =>
+                            setFormData({ ...formData, phone: e.target.value })
+                          }
+                          className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) =>
+                            setFormData({ ...formData, email: e.target.value })
+                          }
+                          className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+                        />
+                      </div>
+                    </div>
 
-                  <button
-                    type="submit"
-                    className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition w-full"
-                  >
-                    Submit & Continue →
-                  </button>
-                </form>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        )}
+                    {/* Address */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Street Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.address}
+                        onChange={(e) =>
+                          setFormData({ ...formData, address: e.target.value })
+                        }
+                        className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+                      />
+                    </div>
 
-        {!finished && (
-          <div className="mt-8 flex justify-between">
-            <button
-              onClick={handlePrev}
-              disabled={step === 0}
-              className={`text-gray-600 hover:text-red-600 ${
-                step === 0 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              ← Previous
-            </button>
-          </div>
-        )}
+                    {/* City / State / Zip */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          City <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.city}
+                          onChange={(e) =>
+                            setFormData({ ...formData, city: e.target.value })
+                          }
+                          className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          State <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="state"
+                          value={formData.state}
+                          onChange={handleChange}
+                          className="w-full border rounded-md p-2"
+                        >
+                          <option value="">Select State</option>
+                          <option value="AL">Alabama</option>
+                          <option value="AK">Alaska</option>
+                          <option value="AZ">Arizona</option>
+                          <option value="AR">Arkansas</option>
+                          <option value="CA">California</option>
+                          <option value="CO">Colorado</option>
+                          <option value="CT">Connecticut</option>
+                          <option value="DE">Delaware</option>
+                          <option value="FL">Florida</option>
+                          <option value="GA">Georgia</option>
+                          <option value="HI">Hawaii</option>
+                          <option value="ID">Idaho</option>
+                          <option value="IL">Illinois</option>
+                          <option value="IN">Indiana</option>
+                          <option value="IA">Iowa</option>
+                          <option value="KS">Kansas</option>
+                          <option value="KY">Kentucky</option>
+                          <option value="LA">Louisiana</option>
+                          <option value="ME">Maine</option>
+                          <option value="MD">Maryland</option>
+                          <option value="MA">Massachusetts</option>
+                          <option value="MI">Michigan</option>
+                          <option value="MN">Minnesota</option>
+                          <option value="MS">Mississippi</option>
+                          <option value="MO">Missouri</option>
+                          <option value="MT">Montana</option>
+                          <option value="NE">Nebraska</option>
+                          <option value="NV">Nevada</option>
+                          <option value="NH">New Hampshire</option>
+                          <option value="NJ">New Jersey</option>
+                          <option value="NM">New Mexico</option>
+                          <option value="NY">New York</option>
+                          <option value="NC">North Carolina</option>
+                          <option value="ND">North Dakota</option>
+                          <option value="OH">Ohio</option>
+                          <option value="OK">Oklahoma</option>
+                          <option value="OR">Oregon</option>
+                          <option value="PA">Pennsylvania</option>
+                          <option value="RI">Rhode Island</option>
+                          <option value="SC">South Carolina</option>
+                          <option value="SD">South Dakota</option>
+                          <option value="TN">Tennessee</option>
+                          <option value="TX">Texas</option>
+                          <option value="UT">Utah</option>
+                          <option value="VT">Vermont</option>
+                          <option value="VA">Virginia</option>
+                          <option value="WA">Washington</option>
+                          <option value="WV">West Virginia</option>
+                          <option value="WI">Wisconsin</option>
+                          <option value="WY">Wyoming</option>
+                          <option value="DC">District of Columbia</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Zip <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.zip}
+                          onChange={(e) =>
+                            setFormData({ ...formData, zip: e.target.value })
+                          }
+                          className="border border-gray-300 rounded-md px-4 py-2 w-full focus:ring-2 focus:ring-red-500 outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Agreement */}
+                    <label className="flex items-start space-x-2 text-sm text-gray-600">
+                      <input
+                        type="checkbox"
+                        checked={agree}
+                        onChange={(e) => setAgree(e.target.checked)}
+                        className="mt-1 w-5 h-5 bg-green-500"
+                      />
+                      <span>
+                        By checking this box, I confirm that I have read and
+                        agree to the{" "}
+                        <a href="/privacy" className="text-red-600 underline">
+                          Privacy Policy
+                        </a>{" "}
+                        and Terms of Service.
+                      </span>
+                    </label>
+
+                    <button
+                      type="submit"
+                      className="bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700  hover:scale-105 hover:cursor-pointer 
+             transition-all duration-200 ease-in-out active:scale-95 w-full font-semibold shadow-sm"
+                    >
+                      Submit & Continue →
+                    </button>
+
+                    <div className="bg-black text-white text-xs p-4 rounded-md leading-relaxed mt-4">
+                      By pressing the “Submit” button above, I provide my
+                      express written consent to be contacted by phone, email,
+                      or text regarding disability benefits, even if my number
+                      is on a do-not-call list. I understand I am not required
+                      to provide consent as a condition of purchase.
+                    </div>
+                  </form>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          )}
+
+          {!finished && (
+            <div className="mt-8 flex justify-between">
+              <button
+                onClick={handlePrev}
+                disabled={step === 0}
+                className={`text-gray-600 hover:text-red-600 ${
+                  step === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                ← Previous
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

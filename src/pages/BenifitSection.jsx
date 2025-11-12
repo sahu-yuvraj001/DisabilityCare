@@ -26,11 +26,11 @@ const BenifitSection = () => {
       link: "#",
     },
     {
-      title: "Why Atticus?",
+      title: "How can we help?",
       image: notifiapp, // replace with your image path
       points: [
-        "Get all your DisabilityClaimAssist  questions answered, for free.",
-        "Find a vetted DisabilityClaimAssist  lawyer to help win your claim.",
+        "Get all your SSDI Benefits  questions answered, for free.",
+        "We will find a lawyer to help win your claim.",
       ],
       link: "#",
     },
@@ -41,6 +41,7 @@ const BenifitSection = () => {
   <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
     {items.map((item, index) => (
      <motion.div
+     key={index}
         className="flex-1 mb-10 md:mb-0"
         initial={{ opacity: 0, x: -80 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -48,7 +49,6 @@ const BenifitSection = () => {
         viewport={{ once: true }}
       >
      <div
-        key={index}
         className="bg-white rounded-2xl shadow-md p-8 flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-100"
       >
         <img

@@ -40,6 +40,26 @@ function Navbar() {
               </Link>
             </li>
           </ul>
+</div>
+        <div className="hidden md:flex items-center gap-8 text-[#001A54] font-medium">
+          <ul className="hidden md:flex gap-8 text-[#001A54] font-medium">
+            <li>
+              <Link
+                to="/"
+                className="hover:text-red-600 transition-colors duration-200"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/about"
+                className="hover:text-red-600 transition-colors duration-200"
+              >
+                About
+              </Link>
+            </li>
+          </ul>
 
           {/* 🔹 Right Buttons (Desktop only) */}
           {location.pathname === "/survey" ? (
@@ -84,7 +104,7 @@ function Navbar() {
               </Link>
             </div>
 
-            <div className="border-t border-gray-200 mt-3 pt-3 px-3 flex flex-col items-start gap-2">
+             <div className="border-t border-gray-200 mt-3 pt-3 px-3 flex flex-col items-start gap-2">
               {location.pathname === "/survey" ? (
                 <p className="text-[#001A54] font-semibold text-lg">
                   📞 (800) 674-8141
